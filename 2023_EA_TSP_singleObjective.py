@@ -11,6 +11,7 @@ Modified for multicriteria TSP
 
 
 import numpy as np, random, operator, pandas as pd, matplotlib.pyplot as plt
+import datetime
 
 #Create necessary classes and functions
 #Create class to handle "cities
@@ -65,7 +66,7 @@ class Fitness:
                     toCity = self.route[i + 1]
                 else:
                     toCity = self.route[0]
-                pathDistance += fromCity.distance(toCity)
+                pathDistance += distance(fromCity, toCity)
             self.distance = pathDistance
         return self.distance
     
@@ -87,7 +88,7 @@ class Fitness:
                     toCity = self.route[i + 1]
                 else:
                     toCity = self.route[0]
-                pathStress += fromCity.stress(toCity)
+                pathStress += stress(fromCity, toCity)
             self.stress = pathStress
         return self.stress
     
@@ -271,6 +272,8 @@ def geneticAlgorithm(objectiveNrUsed, specialInitialSolutions, population, popSi
     #plot intial population with regard to the two objectives
     plotPopulationAndObjectiveValues(pop, "Initial Population")
     
+    #set start time
+    start = datetime.datetime.now()
     #store infos to plot progress when finished
     progressDistance = []
     progressDistance.append(1 / rankRoutes(pop,1)[0][1])
@@ -283,7 +286,10 @@ def geneticAlgorithm(objectiveNrUsed, specialInitialSolutions, population, popSi
         #store infos to plot progress when finished
         progressDistance.append(1 / rankRoutes(pop,1)[0][1])
         progressStress.append(1 / rankRoutes(pop,2)[0][1])
-        
+    
+    #Calculate used time
+    end = datetime.datetime.now()
+    totalTime = end - start
     #plot progress - distance
     plt.plot(progressDistance)
     plt.ylabel('Distance')
@@ -319,18 +325,19 @@ def geneticAlgorithm(objectiveNrUsed, specialInitialSolutions, population, popSi
     #plot final population with regard to the two objectives
     plotPopulationAndObjectiveValues(pop, "Final Population")
     
-    return bestRoute
+    return bestRoute, totalTime
 
 #Running the genetic algorithm
 #Create list of cities
 cityList = []
+stressDict = {}
+distanceDict = {}
 
 random.seed(44)
 for i in range(1,26):
     cityList.append(City(nr= i, traffic=int(random.random()*40), x=int(random.random() * 200), y=int(random.random() * 200)))
     
 print(cityList)
-
 
 def plotRoute(cityList, title):
     x = []
@@ -354,6 +361,33 @@ def getCityBasedOnNr(cityList,nr):
     else:
         return cityList[nr-1]  
 
+def initCitiesStats():
+    for i in range(0, len(cityList)):
+        for j in range(i, len(cityList)):
+            c1 = cityList[i]
+            c2 = cityList[j]
+            print(f'{c1.nr} {c2.nr}')
+            if not c1.nr in distanceDict.keys():
+                distanceDict[c1.nr] = {}
+            if  not c1.nr in stressDict.keys():
+                stressDict[c1.nr] = {}
+            distanceDict[c1.nr][c2.nr] = c1.distance(c2)
+            stressDict[c1.nr][c2.nr] = c1.stress(c2)
+
+def stress(city1, city2):
+    if city1.nr <= city2.nr:
+        return stressDict[city1.nr][city2.nr]
+    else:
+        return stressDict[city2.nr][city1.nr]
+    
+def distance(city1, city2):
+    if city1.nr <= city2.nr:
+        return distanceDict[city1.nr][city2.nr]
+    else:
+        return distanceDict[city2.nr][city1.nr]
+
+initCitiesStats()
+
 #Provide special initial solutions     <<<<<<<<<<<
 cityNumbersRoute1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
 
@@ -364,13 +398,16 @@ for nr in cityNumbersRoute1:
     
 
 initialSolutionsList = []
-#TODO: Spezielle Intiallösungen der initialSolutionsList übergeben    
+#TODO: Spezielle Intiallösungen der initialSolutionsList übergeben
+#initialSolutionsList =    
     
 #Run the genetic algorithm
 #modify parameters popSize, eliteSize, mutationRate, generations to search for the best solution
 #modify objectiveNrUsed to use different objectives:
 # 1= Minimize distance, 2 = Minimize stress
-bestRoute = geneticAlgorithm(objectiveNrUsed=2, specialInitialSolutions = initialSolutionsList, population=cityList, popSize=200, eliteSize=40, mutationRate=0.001, generations=700)
+bestRoute, timeUsed = geneticAlgorithm(objectiveNrUsed=1, specialInitialSolutions = initialSolutionsList, population=cityList, popSize=100, eliteSize=20, mutationRate=0.01, generations=500)
+
 print(bestRoute)
+print(timeUsed)
 
 plotRoute(bestRoute, "Best final route")
