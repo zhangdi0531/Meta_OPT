@@ -12,6 +12,7 @@ Modified for multicriteria TSP
 
 import numpy as np, random, operator, pandas as pd, matplotlib.pyplot as plt
 import datetime
+import csv
 
 #Create necessary classes and functions
 #Create class to handle "cities
@@ -106,15 +107,19 @@ def createRoute(cityList):
     return route
 
 #Create first "population" (list of routes)
+#Add special initial solututions first and then add missing routes by random
 def initialPopulation(popSize, cityList, specialInitialSolutions):
     population = []
     
-    #TODO: Hinzufügen der speziellen Initiallösungen aus specialInitialSolutions
-    
     numberInitialSolutions = len(specialInitialSolutions)
     print ("Number of special initial solutions:" + str(numberInitialSolutions))
+    for initialSolution in specialInitialSolutions:
+        cityListSolution = []
+        for cityNr in initialSolution:
+            cityListSolution.append(getCityBasedOnNr(cityList, cityNr))
+        population.append(cityListSolution)
 
-    for i in range(0, popSize): #TODO gegebenenfalls anpassen, falls bereits Initiallösungen hinzugefügt
+    for i in range(0, popSize - len(population)):
         population.append(createRoute(cityList))
     return population
 
@@ -135,15 +140,20 @@ def rankRoutes(population, objectiveNrUsed):
 #Create a selection function that will be used to make the list of parent routes
 def selection(popRanked, eliteSize):
     selectionResults = []
-    #TODO: Z.B. Turnierbasierte Selektion statt fitnessproportionaler Selektion
+
+    #We’ll also want to hold on to our best routes, so we introduce elitism
+    for i in range(0, eliteSize):
+        selectionResults.append(popRanked[i][0])
+    
+    # Decide randomly which strategy to use
+    if bool(random.getrandbits(1)):
+        return tournament(popRanked, eliteSize, selectionResults)
+
     # roulette wheel by calculating a relative fitness weight for each individual
     df = pd.DataFrame(np.array(popRanked), columns=["Index","Fitness"])
     df['cum_sum'] = df.Fitness.cumsum()
     df['cum_perc'] = 100*df.cum_sum/df.Fitness.sum()
 
-    #We’ll also want to hold on to our best routes, so we introduce elitism
-    for i in range(0, eliteSize):
-        selectionResults.append(popRanked[i][0])
     #we compare a randomly drawn number to these weights to select our mating pool
     for i in range(0, len(popRanked) - eliteSize):
         pick = 100*random.random()
@@ -151,6 +161,54 @@ def selection(popRanked, eliteSize):
             if pick <= df.iat[i,3]:
                 selectionResults.append(popRanked[i][0])
                 break
+    return selectionResults
+
+#tournament based selection
+def tournament(popRanked, eliteSize, selectionResults):
+    #Create a list of remaining indices in popRanked
+    indices = list(range(eliteSize, len(popRanked)))
+    
+    for i in range(0, len(popRanked) - eliteSize):
+        if len(indices) == 1:
+            selectionResults.append(popRanked[indices[0]][0])
+            continue
+
+        # in a tournament there will be m - 1 matches
+        # if m is too big each tournament will last too long
+        # if m is too small the tournament might not represent
+        # the fitness in the population correctly
+        # we select 2^(n-2) participants, when the
+        # number of possible participants m >= 2^(n)
+        # from n < 6, it will be 2^(n-1)
+        exp = 0
+        while len(indices) >= 2**(exp + 1):
+            exp += 1
+
+        participants = 2
+        if exp < 6:
+            participants **= (exp - 1)
+        else:
+            participants **= (exp - 2)
+
+        randomParticipants = random.sample(indices, participants)
+        while len(randomParticipants) > 1:
+            winners = []
+            # Only count each first to let participants
+            # fight in this format: (1,2), (3,4), (5,6)...
+            for i in range(0, len(randomParticipants), 2):
+                first = randomParticipants[i]
+                second = randomParticipants[i+1]
+                if popRanked[first][1] >= popRanked[second][1]:
+                    winners.append(first)
+                else:
+                    winners.append(second)
+            randomParticipants = winners
+        
+        winner = randomParticipants[0]
+        # Add the winner to the selection and remove it from the pool
+        # of participants
+        selectionResults.append(popRanked[winner][0])
+        indices.remove(winner)
     return selectionResults
 
 #Create mating pool
@@ -398,16 +456,26 @@ for nr in cityNumbersRoute1:
     
 
 initialSolutionsList = []
-#TODO: Spezielle Intiallösungen der initialSolutionsList übergeben
-#initialSolutionsList =    
-    
+
+#Load intial solutions from the csv
+with open('initial_solutions_stress.csv') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    line_count = 0
+    for row in csv_reader:
+        initialSolutionsList.append(list(map(lambda cNr: int(cNr), row)))
+
 #Run the genetic algorithm
 #modify parameters popSize, eliteSize, mutationRate, generations to search for the best solution
 #modify objectiveNrUsed to use different objectives:
 # 1= Minimize distance, 2 = Minimize stress
-bestRoute, timeUsed = geneticAlgorithm(objectiveNrUsed=1, specialInitialSolutions = initialSolutionsList, population=cityList, popSize=100, eliteSize=20, mutationRate=0.01, generations=500)
+bestRoute, timeUsed = geneticAlgorithm(objectiveNrUsed=2, specialInitialSolutions = initialSolutionsList, population=cityList, popSize=200, eliteSize=90, mutationRate=0.001, generations=500)
 
 print(bestRoute)
 print(timeUsed)
+
+#Write the new solution to the csv
+with open('initial_solutions_stress.csv', 'a', newline='', encoding='utf-8') as csv_file:
+    csv_writer = csv.writer(csv_file, delimiter=",")
+    csv_writer.writerow(map(lambda city: city.nr, bestRoute))
 
 plotRoute(bestRoute, "Best final route")
