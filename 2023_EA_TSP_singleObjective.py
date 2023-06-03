@@ -446,19 +446,78 @@ def distance(city1, city2):
 
 initCitiesStats()
 
-#Provide special initial solutions     <<<<<<<<<<<
-cityNumbersRoute1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+#Input the parameters for the algorithm
+objectiveNr = 1 
+objectiveInValid = False
+while not objectiveInValid:
+    objectiveIn = input('Please enter the objective number (1 -> distance, 2 -> stress): (default 1) ')
+    if objectiveIn == '':
+        objectiveInValid = True
+    elif objectiveIn in {'1', '2'}:
+        objectiveNr = int(objectiveIn)
+        objectiveInValid = True
+    else:
+        print('This value is not allowed.')
 
+popSize = 100
+popSizeValid = False
+while not popSizeValid:
+    popSizeIn = input('Please enter the population size: (default 100) ')
+    if popSizeIn == '':
+        popSizeValid = True
+    elif popSizeIn.isdigit() and int(popSizeIn) >= 0:
+        popSize = int(popSizeIn)
+        popSizeValid = True
+    else:
+        print('This value is not allowed.')
 
-route1 = []
-for nr in cityNumbersRoute1:
-    route1.append(getCityBasedOnNr(cityList,nr))
-    
+eliteSize = 20
+eliteSizeValid = False
+while not eliteSizeValid:
+    eliteSizeIn = input('Please enter the elite size: (default 20) ')
+    if eliteSizeIn == '':
+        eliteSizeValid = True
+    elif eliteSizeIn.isdigit() and int(eliteSizeIn) >= 0:
+        eliteSize = int(eliteSizeIn)
+        eliteSizeValid = True
+    else:
+        print('This value is not allowed.')
+
+mutationRate = 20
+mutationRateValid = False
+while not mutationRateValid:
+    mutationRateIn = input('Please enter the mutation rate (float between 0 and 1): (default 0.01) ')
+    if mutationRateIn == '':
+        mutationRateValid = True
+    elif mutationRateIn.replace(".", "").isnumeric() and float(mutationRateIn) >= 0 and float(mutationRateIn) <= 1:
+        mutationRate = float(mutationRateIn)
+        mutationRateValid = True
+    else:
+        print('This value is not allowed.')
+
+generationSize = 500
+generationSizeValid = False
+while not generationSizeValid:
+    generationSizeIn = input('Please enter the generation size: (default 500) ')
+    if generationSizeIn == '':
+        generationSizeValid = True
+    elif generationSizeIn.isdigit() and int(generationSizeIn) >= 0:
+        generationSize = int(generationSizeIn)
+        generationSizeValid = True
+    else:
+        print('This value is not allowed.')
+
 
 initialSolutionsList = []
+csv_name = ""
+
+if objectiveNr == 1:
+    csv_name = 'initial_solutions_distance.csv'
+else:
+    csv_name = 'initial_solutions_stress.csv'
 
 #Load intial solutions from the csv
-with open('initial_solutions_stress.csv') as csv_file:
+with open(csv_name) as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
     for row in csv_reader:
@@ -468,13 +527,13 @@ with open('initial_solutions_stress.csv') as csv_file:
 #modify parameters popSize, eliteSize, mutationRate, generations to search for the best solution
 #modify objectiveNrUsed to use different objectives:
 # 1= Minimize distance, 2 = Minimize stress
-bestRoute, timeUsed = geneticAlgorithm(objectiveNrUsed=2, specialInitialSolutions = initialSolutionsList, population=cityList, popSize=200, eliteSize=90, mutationRate=0.001, generations=500)
+bestRoute, timeUsed = geneticAlgorithm(objectiveNrUsed=objectiveNr, specialInitialSolutions = initialSolutionsList, population=cityList, popSize=popSize, eliteSize=eliteSize, mutationRate=mutationRate, generations=generationSize)
 
 print(bestRoute)
 print(timeUsed)
 
 #Write the new solution to the csv
-with open('initial_solutions_stress.csv', 'a', newline='', encoding='utf-8') as csv_file:
+with open(csv_name, 'a', newline='', encoding='utf-8') as csv_file:
     csv_writer = csv.writer(csv_file, delimiter=",")
     csv_writer.writerow(map(lambda city: city.nr, bestRoute))
 
