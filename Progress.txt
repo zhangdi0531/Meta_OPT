@@ -128,7 +128,7 @@ Final objective: 2654.5999999999995
 Final distance : 2497.215564300347
 Final stress:    2654.5999999999995
 
-200, 40, 0.01, 00
+200, 40, 0.01, 700
 Number of special initial solutions:0
 Initial objective: 4817.8
 Initial distance : 2786.049015732933

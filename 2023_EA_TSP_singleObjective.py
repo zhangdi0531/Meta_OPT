@@ -11,6 +11,8 @@ Modified for multicriteria TSP
 
 
 import numpy as np, random, operator, pandas as pd, matplotlib.pyplot as plt
+import datetime
+import csv
 
 #Create necessary classes and functions
 #Create class to handle "cities
@@ -65,7 +67,7 @@ class Fitness:
                     toCity = self.route[i + 1]
                 else:
                     toCity = self.route[0]
-                pathDistance += fromCity.distance(toCity)
+                pathDistance += distance(fromCity, toCity)
             self.distance = pathDistance
         return self.distance
     
@@ -87,7 +89,7 @@ class Fitness:
                     toCity = self.route[i + 1]
                 else:
                     toCity = self.route[0]
-                pathStress += fromCity.stress(toCity)
+                pathStress += stress(fromCity, toCity)
             self.stress = pathStress
         return self.stress
     
@@ -105,15 +107,19 @@ def createRoute(cityList):
     return route
 
 #Create first "population" (list of routes)
+#Add special initial solututions first and then add missing routes by random
 def initialPopulation(popSize, cityList, specialInitialSolutions):
     population = []
     
-    #TODO: Hinzufügen der speziellen Initiallösungen aus specialInitialSolutions
-    
     numberInitialSolutions = len(specialInitialSolutions)
     print ("Number of special initial solutions:" + str(numberInitialSolutions))
+    for initialSolution in specialInitialSolutions:
+        cityListSolution = []
+        for cityNr in initialSolution:
+            cityListSolution.append(getCityBasedOnNr(cityList, cityNr))
+        population.append(cityListSolution)
 
-    for i in range(0, popSize): #TODO gegebenenfalls anpassen, falls bereits Initiallösungen hinzugefügt
+    for i in range(0, popSize - len(population)):
         population.append(createRoute(cityList))
     return population
 
@@ -134,15 +140,20 @@ def rankRoutes(population, objectiveNrUsed):
 #Create a selection function that will be used to make the list of parent routes
 def selection(popRanked, eliteSize):
     selectionResults = []
-    #TODO: Z.B. Turnierbasierte Selektion statt fitnessproportionaler Selektion
+
+    #We’ll also want to hold on to our best routes, so we introduce elitism
+    for i in range(0, eliteSize):
+        selectionResults.append(popRanked[i][0])
+    
+    # Decide randomly which strategy to use
+    if bool(random.getrandbits(1)):
+        return tournament(popRanked, eliteSize, selectionResults)
+
     # roulette wheel by calculating a relative fitness weight for each individual
     df = pd.DataFrame(np.array(popRanked), columns=["Index","Fitness"])
     df['cum_sum'] = df.Fitness.cumsum()
     df['cum_perc'] = 100*df.cum_sum/df.Fitness.sum()
 
-    #We’ll also want to hold on to our best routes, so we introduce elitism
-    for i in range(0, eliteSize):
-        selectionResults.append(popRanked[i][0])
     #we compare a randomly drawn number to these weights to select our mating pool
     for i in range(0, len(popRanked) - eliteSize):
         pick = 100*random.random()
@@ -150,6 +161,54 @@ def selection(popRanked, eliteSize):
             if pick <= df.iat[i,3]:
                 selectionResults.append(popRanked[i][0])
                 break
+    return selectionResults
+
+#tournament based selection
+def tournament(popRanked, eliteSize, selectionResults):
+    #Create a list of remaining indices in popRanked
+    indices = list(range(eliteSize, len(popRanked)))
+    
+    for i in range(0, len(popRanked) - eliteSize):
+        if len(indices) == 1:
+            selectionResults.append(popRanked[indices[0]][0])
+            continue
+
+        # in a tournament there will be m - 1 matches
+        # if m is too big each tournament will last too long
+        # if m is too small the tournament might not represent
+        # the fitness in the population correctly
+        # we select 2^(n-2) participants, when the
+        # number of possible participants m >= 2^(n)
+        # from n < 6, it will be 2^(n-1)
+        exp = 0
+        while len(indices) >= 2**(exp + 1):
+            exp += 1
+
+        participants = 2
+        if exp < 6:
+            participants **= (exp - 1)
+        else:
+            participants **= (exp - 2)
+
+        randomParticipants = random.sample(indices, participants)
+        while len(randomParticipants) > 1:
+            winners = []
+            # Only count each first to let participants
+            # fight in this format: (1,2), (3,4), (5,6)...
+            for i in range(0, len(randomParticipants), 2):
+                first = randomParticipants[i]
+                second = randomParticipants[i+1]
+                if popRanked[first][1] >= popRanked[second][1]:
+                    winners.append(first)
+                else:
+                    winners.append(second)
+            randomParticipants = winners
+        
+        winner = randomParticipants[0]
+        # Add the winner to the selection and remove it from the pool
+        # of participants
+        selectionResults.append(popRanked[winner][0])
+        indices.remove(winner)
     return selectionResults
 
 #Create mating pool
@@ -271,6 +330,8 @@ def geneticAlgorithm(objectiveNrUsed, specialInitialSolutions, population, popSi
     #plot intial population with regard to the two objectives
     plotPopulationAndObjectiveValues(pop, "Initial Population")
     
+    #set start time
+    start = datetime.datetime.now()
     #store infos to plot progress when finished
     progressDistance = []
     progressDistance.append(1 / rankRoutes(pop,1)[0][1])
@@ -283,7 +344,10 @@ def geneticAlgorithm(objectiveNrUsed, specialInitialSolutions, population, popSi
         #store infos to plot progress when finished
         progressDistance.append(1 / rankRoutes(pop,1)[0][1])
         progressStress.append(1 / rankRoutes(pop,2)[0][1])
-        
+    
+    #Calculate used time
+    end = datetime.datetime.now()
+    totalTime = end - start
     #plot progress - distance
     plt.plot(progressDistance)
     plt.ylabel('Distance')
@@ -319,18 +383,19 @@ def geneticAlgorithm(objectiveNrUsed, specialInitialSolutions, population, popSi
     #plot final population with regard to the two objectives
     plotPopulationAndObjectiveValues(pop, "Final Population")
     
-    return bestRoute
+    return bestRoute, totalTime
 
 #Running the genetic algorithm
 #Create list of cities
 cityList = []
+stressDict = {}
+distanceDict = {}
 
 random.seed(44)
 for i in range(1,26):
     cityList.append(City(nr= i, traffic=int(random.random()*40), x=int(random.random() * 200), y=int(random.random() * 200)))
     
 print(cityList)
-
 
 def plotRoute(cityList, title):
     x = []
@@ -354,23 +419,122 @@ def getCityBasedOnNr(cityList,nr):
     else:
         return cityList[nr-1]  
 
-#Provide special initial solutions     <<<<<<<<<<<
-cityNumbersRoute1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+def initCitiesStats():
+    for i in range(0, len(cityList)):
+        for j in range(i, len(cityList)):
+            c1 = cityList[i]
+            c2 = cityList[j]
+            print(f'{c1.nr} {c2.nr}')
+            if not c1.nr in distanceDict.keys():
+                distanceDict[c1.nr] = {}
+            if  not c1.nr in stressDict.keys():
+                stressDict[c1.nr] = {}
+            distanceDict[c1.nr][c2.nr] = c1.distance(c2)
+            stressDict[c1.nr][c2.nr] = c1.stress(c2)
 
-
-route1 = []
-for nr in cityNumbersRoute1:
-    route1.append(getCityBasedOnNr(cityList,nr))
+def stress(city1, city2):
+    if city1.nr <= city2.nr:
+        return stressDict[city1.nr][city2.nr]
+    else:
+        return stressDict[city2.nr][city1.nr]
     
+def distance(city1, city2):
+    if city1.nr <= city2.nr:
+        return distanceDict[city1.nr][city2.nr]
+    else:
+        return distanceDict[city2.nr][city1.nr]
+
+initCitiesStats()
+
+#Input the parameters for the algorithm
+objectiveNr = 1 
+objectiveInValid = False
+while not objectiveInValid:
+    objectiveIn = input('Please enter the objective number (1 -> distance, 2 -> stress): (default 1) ')
+    if objectiveIn == '':
+        objectiveInValid = True
+    elif objectiveIn in {'1', '2'}:
+        objectiveNr = int(objectiveIn)
+        objectiveInValid = True
+    else:
+        print('This value is not allowed.')
+
+popSize = 100
+popSizeValid = False
+while not popSizeValid:
+    popSizeIn = input('Please enter the population size: (default 100) ')
+    if popSizeIn == '':
+        popSizeValid = True
+    elif popSizeIn.isdigit() and int(popSizeIn) >= 0:
+        popSize = int(popSizeIn)
+        popSizeValid = True
+    else:
+        print('This value is not allowed.')
+
+eliteSize = 20
+eliteSizeValid = False
+while not eliteSizeValid:
+    eliteSizeIn = input('Please enter the elite size: (default 20) ')
+    if eliteSizeIn == '':
+        eliteSizeValid = True
+    elif eliteSizeIn.isdigit() and int(eliteSizeIn) >= 0:
+        eliteSize = int(eliteSizeIn)
+        eliteSizeValid = True
+    else:
+        print('This value is not allowed.')
+
+mutationRate = 20
+mutationRateValid = False
+while not mutationRateValid:
+    mutationRateIn = input('Please enter the mutation rate (float between 0 and 1): (default 0.01) ')
+    if mutationRateIn == '':
+        mutationRateValid = True
+    elif mutationRateIn.replace(".", "").isnumeric() and float(mutationRateIn) >= 0 and float(mutationRateIn) <= 1:
+        mutationRate = float(mutationRateIn)
+        mutationRateValid = True
+    else:
+        print('This value is not allowed.')
+
+generationSize = 500
+generationSizeValid = False
+while not generationSizeValid:
+    generationSizeIn = input('Please enter the generation size: (default 500) ')
+    if generationSizeIn == '':
+        generationSizeValid = True
+    elif generationSizeIn.isdigit() and int(generationSizeIn) >= 0:
+        generationSize = int(generationSizeIn)
+        generationSizeValid = True
+    else:
+        print('This value is not allowed.')
+
 
 initialSolutionsList = []
-#TODO: Spezielle Intiallösungen der initialSolutionsList übergeben    
-    
+csv_name = ""
+
+if objectiveNr == 1:
+    csv_name = 'initial_solutions_distance.csv'
+else:
+    csv_name = 'initial_solutions_stress.csv'
+
+#Load intial solutions from the csv
+with open(csv_name) as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    line_count = 0
+    for row in csv_reader:
+        initialSolutionsList.append(list(map(lambda cNr: int(cNr), row)))
+
 #Run the genetic algorithm
 #modify parameters popSize, eliteSize, mutationRate, generations to search for the best solution
 #modify objectiveNrUsed to use different objectives:
 # 1= Minimize distance, 2 = Minimize stress
-bestRoute = geneticAlgorithm(objectiveNrUsed=2, specialInitialSolutions = initialSolutionsList, population=cityList, popSize=200, eliteSize=40, mutationRate=0.001, generations=700)
+bestRoute, timeUsed = geneticAlgorithm(objectiveNrUsed=objectiveNr, specialInitialSolutions = initialSolutionsList, population=cityList, popSize=popSize, eliteSize=eliteSize, mutationRate=mutationRate, generations=generationSize)
+
 print(bestRoute)
+print(timeUsed)
+
+#Write the new solution to the csv
+with open(csv_name, 'a', newline='', encoding='utf-8') as csv_file:
+    csv_writer = csv.writer(csv_file, delimiter=",")
+    csv_writer.writerow(map(lambda city: city.nr, bestRoute))
 
 plotRoute(bestRoute, "Best final route")
