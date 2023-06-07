@@ -516,8 +516,10 @@ if objectiveNr == 1:
 else:
     csv_name = 'initial_solutions_stress.csv'
 
+csv_path = f'../data/{csv_name}'
+
 #Load intial solutions from the csv
-with open(csv_name) as csv_file:
+with open(csv_path) as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
     for row in csv_reader:
@@ -533,7 +535,7 @@ print(bestRoute)
 print(timeUsed)
 
 #Write the new solution to the csv
-with open(csv_name, 'a', newline='', encoding='utf-8') as csv_file:
+with open(csv_path, 'a', newline='', encoding='utf-8') as csv_file:
     csv_writer = csv.writer(csv_file, delimiter=",")
     csv_writer.writerow(map(lambda city: city.nr, bestRoute))
 
