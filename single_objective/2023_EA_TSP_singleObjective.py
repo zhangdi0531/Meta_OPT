@@ -483,7 +483,7 @@ while not eliteSizeValid:
     else:
         print('This value is not allowed.')
 
-mutationRate = 20
+mutationRate = 0.01
 mutationRateValid = False
 while not mutationRateValid:
     mutationRateIn = input('Please enter the mutation rate (float between 0 and 1): (default 0.01) ')
