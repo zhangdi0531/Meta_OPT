@@ -1,5 +1,26 @@
 DISTANCE
 
+150, 30, 0,001, 500
+Number of special initial solutions:0
+Initial objective: 2353.06837664206
+Initial distance : 2353.06837664206
+Initial stress:    7269.599999999999
+Final objective: 904.1547477144662
+Final distance : 904.1547477144662
+Final stress:    6396.8
+3, 7, 19, 2, 21, 24, 18, 9, 8, 14, 17, 20, 15, 4, 12, 25, 1, 10, 5, 22, 6, 13, 23, 16, 11
+
+
+50, 20, 0,01, 500
+Number of special initial solutions:0
+Initial objective: 2440.138322144057
+Initial distance : 2440.138322144057
+Initial stress:    6923.6
+Final objective: 940.6977587858066
+Final distance : 940.6977587858065
+Final stress:    6413.799999999999
+23, 16, 11, 2, 19, 7, 3, 21, 24, 18, 9, 8, 14, 17, 20, 15, 4, 25, 12, 1, 10, 22, 5, 6, 13
+
 100, 20, 0.01, 500
 Number of special initial solutions:0
 Initial objective: 2353.06837664206
@@ -9,6 +30,16 @@ Final objective: 962.8088822677422
 Final distance : 962.8088822677423
 Final stress:    6158.0
 
+150, 20, 0.01, 500
+Number of special initial solutions:0
+Initial objective: 2353.06837664206
+Initial distance : 2353.06837664206
+Initial stress:    7269.599999999999
+Final objective: 896.6446997304089
+Final distance : 896.6446997304089
+Final stress:    6239.0
+18, 24, 21, 11, 2, 19, 7, 3, 23, 16, 13, 6, 22, 5, 10, 1, 25, 12, 4, 15, 20, 17, 14, 8, 9
+
 200, 20, 0.01, 500
 Number of special initial solutions:0
 Initial objective: 2353.06837664206
@@ -17,6 +48,17 @@ Initial stress:    7269.599999999999
 Final objective: 896.6446997304089
 Final distance : 896.6446997304088
 Final stress:    6239.0
+
+250, 20, 0.01, 500
+Number of special initial solutions:0
+Initial objective: 2330.946915344579
+Initial distance : 2330.946915344579
+Initial stress:    6860.8
+Final objective: 989.3066341934282
+Final distance : 989.3066341934282
+Final stress:    6649.0
+, 8, 9, 18, 24, 11, 16, 6, 13, 23, 3, 7, 19, 2, 21, 14, 17, 20, 15, 5, 22, 10, 1, 25, 12
+
 
 100, 40, 0.01, 500
 Number of special initial solutions:0
@@ -35,6 +77,56 @@ Initial stress:    7269.599999999999
 Final objective: 2047.49874842353
 Final distance : 2047.49874842353
 Final stress:    6907.6
+
+100, 20, 0.001, 500
+Number of special initial solutions:0
+Initial objective: 2353.06837664206
+Initial distance : 2353.06837664206
+Initial stress:    7269.599999999999
+Final objective: 925.5365389107847
+Final distance : 925.5365389107847
+Final stress:    6522.0
+1, 25, 12, 4, 20, 15, 17, 14, 18, 8, 9, 24, 21, 11, 2, 19, 7, 3, 23, 16, 13, 6, 22, 5, 10
+
+100, 30, 0.01, 500
+Number of special initial solutions:0
+Initial objective: 2353.06837664206
+Initial distance : 2353.06837664206
+Initial stress:    7269.599999999999
+Final objective: 926.7321971361646
+Final distance : 926.7321971361646
+Final stress:    6320.2
+16, 11, 2, 19, 7, 3, 21, 24, 18, 9, 8, 14, 17, 20, 15, 4, 12, 25, 1, 10, 22, 5, 6, 13, 23
+
+100, 50, 0.01, 500
+Number of special initial solutions:0
+Initial objective: 2353.06837664206
+Initial distance : 2353.06837664206
+Initial stress:    7269.599999999999
+Final objective: 937.0041128184821
+Final distance : 937.0041128184821
+Final stress:    6940.6
+14, 18, 9, 8, 24, 21, 3, 7, 19, 2, 11, 16, 23, 13, 6, 22, 5, 10, 1, 25, 12, 4, 15, 20, 17
+
+100, 20, 0.01, 400
+Number of special initial solutions:0
+Initial objective: 2353.06837664206
+Initial distance : 2353.06837664206
+Initial stress:    7269.599999999999
+Final objective: 962.8088822677424
+Final distance : 962.8088822677424
+Final stress:    6158.0
+2, 19, 7, 3, 23, 16, 13, 6, 22, 10, 1, 5, 20, 15, 25, 12, 4, 8, 9, 18, 24, 17, 14, 21, 11
+
+100, 20, 0.01, 600
+Number of special initial solutions:0
+Initial objective: 2353.06837664206
+Initial distance : 2353.06837664206
+Initial stress:    7269.599999999999
+Final objective: 962.8088822677422
+Final distance : 962.8088822677422
+Final stress:    6158.0
+10, 1, 5, 20, 15, 25, 12, 4, 8, 9, 18, 24, 17, 14, 21, 11, 2, 19, 7, 3, 23, 16, 13, 6, 22
 
 100, 20, 0.01, 700
 Number of special initial solutions:0
@@ -64,6 +156,21 @@ Final distance : 896.6446997304088
 Final stress:    6239.0
 
 STRESS
+50, 20, 0.01, 500
+Number of special initial solutions:0
+Initial objective: 5005.4
+Initial distance : 2851.5617294659114
+Initial stress:    5005.4
+Final objective: 3181.1999999999994
+Final distance : 2591.1760346314677
+Final stress:    3181.2
+14, 25, 1, 6, 18, 19, 4, 16, 11, 23, 24, 13, 22, 7, 21, 3, 17, 12, 15, 5, 20, 10, 8, 9, 2
+
+150, 20, 0.01, 500
+Number of special initial solutions:0
+Initial objective: 4817.8
+Initial distance : 2786.049015732933
+Initial stress:    4817.8
 
 100, 20, 0.01, 500
 Number of special initial solutions:0
@@ -73,6 +180,98 @@ Initial stress:    4817.8
 Final objective: 2806.0
 Final distance : 2356.020618477412
 Final stress:    2806.0
+
+150, 20, 0.01, 500
+Number of special initial solutions:0
+Initial objective: 4817.8
+Initial distance : 2786.049015732933
+Initial stress:    4817.8
+Final objective: 2713.3999999999996
+Final distance : 3158.231010118578
+Final stress:    2713.3999999999996
+12, 18, 6, 25, 23, 22, 9, 3, 15, 5, 20, 10, 11, 13, 1, 19, 4, 16, 2, 14, 7, 8, 17, 24, 21
+
+250, 20, 0.01, 500
+Number of special initial solutions:0
+Initial objective: 4817.8
+Initial distance : 2786.049015732933
+Initial stress:    4817.8
+Final objective: 2729.7999999999997
+Final distance : 2700.6773378100174
+Final stress:    2729.7999999999997
+12, 17, 24, 21, 3, 15, 5, 25, 13, 19, 7, 14, 2, 20, 10, 8, 4, 16, 22, 23, 1, 11, 6, 18, 9
+
+100, 20, 0.1, 500
+Number of special initial solutions:0
+Initial objective: 4817.8
+Initial distance : 2786.049015732933
+Initial stress:    4817.8
+Final objective: 4414.0
+Final distance : 2783.507739332941
+Final stress:    4414.0
+22, 17, 1, 5, 7, 2, 20, 10, 12, 15, 24, 21, 13, 4, 11, 9, 8, 16, 19, 25, 6, 18, 23, 3, 14
+
+100, 50, 0.01, 500
+Number of special initial solutions:0
+Initial objective: 4817.8
+Initial distance : 2786.049015732933
+Initial stress:    4817.8
+Final objective: 3037.4
+Final distance : 2505.7286897863737
+Final stress:    3037.4
+1, 22, 15, 3, 6, 18, 24, 21, 7, 14, 12, 16, 2, 10, 5, 20, 4, 8, 9, 11, 17, 19, 23, 25, 13
+
+100, 20, 0.001, 500
+Number of special initial solutions:0
+Initial objective: 4817.8
+Initial distance : 2786.049015732933
+Initial stress:    4817.8
+Final objective: 2691.2000000000007
+Final distance : 2802.266097435821
+Final stress:    2691.2000000000007
+18, 24, 17, 22, 13, 25, 4, 16, 8, 23, 1, 19, 7, 14, 2, 20, 10, 5, 15, 12, 21, 3, 9, 11, 6
+
+100, 50, 0.01, 400
+Number of special initial solutions:0
+Initial objective: 4817.8
+Initial distance : 2786.049015732933
+Initial stress:    4817.8
+Final objective: 2869.5999999999995
+Final distance : 2423.436964478208
+Final stress:    2869.5999999999995
+24, 17, 12, 21, 8, 16, 4, 1, 25, 6, 18, 9, 22, 20, 10, 5, 15, 3, 23, 19, 7, 11, 13, 2, 14
+
+100, 50, 0.01, 600
+Number of special initial solutions:0
+Initial objective: 4817.8
+Initial distance : 2786.049015732933
+Initial stress:    4817.8
+Final objective: 2948.4000000000005
+Final distance : 2953.693643367394
+Final stress:    2948.4000000000005
+1, 12, 23, 24, 17, 3, 21, 22, 20, 10, 5, 15, 8, 16, 4, 2, 6, 18, 9, 19, 13, 11, 25, 7, 14
+
+100, 50, 0.01, 700
+Number of special initial solutions:0
+Initial objective: 4817.8
+Initial distance : 2786.049015732933
+Initial stress:    4817.8
+Final objective: 2812.0
+Final distance : 2663.4572147431168
+Final stress:    2812.0
+6, 18, 9, 12, 17, 11, 7, 14, 24, 21, 3, 15, 22, 23, 19, 13, 8, 16, 4, 2, 20, 10, 5, 25, 1
+
+150, 50, 0.01, 500
+Number of special initial solutions:0
+Initial objective: 4817.8
+Initial distance : 2786.049015732933
+Initial stress:    4817.8
+Final objective: 2628.7999999999997
+Final distance : 2785.533000603163
+Final stress:    2628.7999999999997
+---- 
+City Numbers of Best Route
+[11, 13, 1, 19, 23, 25, 5, 10, 20, 4, 16, 8, 9, 22, 17, 24, 21, 3, 15, 12, 7, 14, 2, 18, 6]
 
 200, 20, 0.01, 500
 Number of special initial solutions:0
